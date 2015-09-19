@@ -7,4 +7,5 @@ The application also visualizes the result at each geographical coordinates on
 a map using basemap module. It dynamically reads the tweets, classify it and
 plots it on the map.
 
-Suggestions and any kind of contributions welcome.
+This is just a basic prototype. There are lots of issues in it that is to be
+fixed. Suggestions and any kind of contributions welcome.
