@@ -5,17 +5,17 @@ import math
 def _get_np_array(nr, nc, l, h):
     return np.array([np.array([random.uniform(l, h)    for c in range(nc)])    for r in range(nr)])
 
-def _sigmoid(x):
-    return 1 / (1 + math.exp(-x))
+def _sigmoid(X):
+    return map(lambda(x): 1/(1 + math.exp(-x)), X)
 
-def _deriv_sigmoid(x):
-    return x * (1 - x)
+def _deriv_sigmoid(X):
+    return map(lambda(x): x*(1 - x), X)
 
 class ANN:
     def __init__(self, ni, nh, no, iteration=3000, lr=1.0):
-        self.ni = ni #+ 1 # for bias
+        self.ni = ni
         self.no = no
-        self.nh = nh #+ 1 # for bias
+        self.nh = nh
         self.lr = lr
         self.iteration = iteration
 
@@ -24,16 +24,16 @@ class ANN:
 
 
     def _train(self, x):
-        self.x = x
-        self._out_hidden = np.array([_sigmoid(np.dot(w, np.array(x)))    for w in self.wi])
-        self._output = np.array([_sigmoid(np.dot(out, self._out_hidden))    for out in self.wo])
+        self.x = np.array(x)
+        self._out_hidden = np.array(_sigmoid(np.dot(self.wi, self.x)))
+        self._output = np.array(_sigmoid(np.dot(self.wo, self._out_hidden)))
 
     def _back_propagate(self, y):
-        self.delta_o = np.array([_deriv_sigmoid(i)    for i in self._output]) * (np.array(y) - self._output)
+        self.delta_o = np.array(_deriv_sigmoid(self._output)) * (np.array(y) - self._output)
         self.wo = self.wo + (self.lr * np.array([self._out_hidden * d    for d in self.delta_o]))
 
-        self.delta_h = np.array([_deriv_sigmoid(i)    for i in self._out_hidden]) * np.dot(self.wo.transpose(), self.delta_o)
-        self.wi = self.wi + (self.lr * self.delta_h.reshape(self.nh, 1) * np.array(self.x))
+        self.delta_h = np.array(_deriv_sigmoid(self._out_hidden)) * np.dot(self.wo.transpose(), self.delta_o)
+        self.wi = self.wi + (self.lr * self.delta_h.reshape(self.delta_h.shape[0], 1) * self.x)
 
     def fit(self, X, Y):
         for i in range(self.iteration):
