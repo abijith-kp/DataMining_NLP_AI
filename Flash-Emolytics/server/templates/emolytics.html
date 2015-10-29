@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Leaflet Quick Start Guide Example</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/leaflet.css" />
+    
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css" integrity="sha384-aUGj/X2zp5rLCbBxumKTCw2Z50WgIr1vs/PFN4praOTvYXWlVyh2UtNUU0KAUhAX" crossorigin="anonymous">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
+
+</head>
+<body>
+    <script src="leaflet.js"></script>
+    <div id="map" style="width: 150vh; height: 500px; margin:0 auto;"></div>
+
+    <br />
+        <form class="form-horizontal form-group">
+        <div class="form-control form-group-lg">
+        <input id="searchText" class="form-control input-lg" type="text" placeholder=".input-lg">
+        <span class="input-group-btn">
+            <button onclick="analytics(document.getElementById('searchText').value)" id="searchBtn" class="btn btn-success" type="button">Search</button>
+        </span>
+        </div>
+        </form>
+
+    <script>
+        function analytics(searchText) {
+            httpPost("/analytics", {'text': searchText});
+        }
+
+        function httpGet(theUrl) {
+            var xmlHttp = new XMLHttpRequest();
+            xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
+            xmlHttp.send( null );
+            return xmlHttp.responseText;
+        }
+
+        function httpPost(theUrl, jsonData) {
+            var str_json = JSON.stringify(jsonData);
+            request= new XMLHttpRequest();
+            request.open("POST", theUrl, true);
+            request.setRequestHeader("Content-type", "application/json");
+            request.send(str_json);
+        }
+
+        var map = L.map('map').setView([0.0, 0.0], 2);
+        /* TODO
+         * Could have tried with OSM.
+         */
+        L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={access_token}', {
+            attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+            maxZoom: 18,
+            id: 'abijithkp.o03c721b',
+        }).addTo(map);
+
+    function addCircles(data) {
+            var circle = new L.circle([data.lat, data.lon], 5, {
+                color: data.color,
+                fillOpacity: 0.5
+            }).addTo(map);
+    }
+    var t = setInterval(function() { var data = JSON.parse(httpGet("/point")); addCircles(data); }, 1000);
+    </script>
+</body>
+</html>
